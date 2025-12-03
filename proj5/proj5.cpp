@@ -14,7 +14,6 @@
 #include <iostream>
 #include <sstream>
 
-
 static void parse_args(int argc, char **argv, std::string &host, int &port)
 {
     host.clear();
@@ -37,7 +36,6 @@ static void parse_args(int argc, char **argv, std::string &host, int &port)
         std::exit(1);
     }
 }
-
 
 class BbpClient
 {
@@ -144,28 +142,38 @@ private:
         if (!in_ || !out_)
         {
             std::fprintf(stderr, "fdopen failed\n");
-            if (in_) std::fclose(in_);
-            if (out_) std::fclose(out_);
+            if (in_)
+                std::fclose(in_);
+            if (out_)
+                std::fclose(out_);
             close(sockfd_);
             std::exit(1);
         }
     }
 
-
     static void printBanner()
     {
         std::cout << "Starting Client" << std::endl;
         std::cout << "Welcome! You are connected to the Book Builder Protocol (BBP) server.\n"
+                  << "This server enables you to add and search for ideas, stored as items, and then link them to each other.\n"
                   << "Enter commands like:\n"
-                  << "  ADD QUOTE;;title;;body\n"
-                  << "  GET 1\n"
-                  << "  LIST PLOT\n"
-                  << "  SEARCH TYPE PLOT hero\n"
-                  << "  SEARCH TITLE redemption\n"
-                  << "  SEARCH KEYWORDS modernity failure\n"
-                  << "  LINK 1 4\n"
-                  << "  CONTEXT 1\n"
+                  << "  ADD <item type to add>;;<title of item>;;<body of item>\n"
+                  << "  GET <id number>\n"
+                  << "  DELETE <id number>\n"
+                  << "  LIST <item type>\n"
+                  << "  SEARCH TYPE <item type> <search term to find match in title or body>\n"
+                  << "  SEARCH TITLE <title of item>\n"
+                  << "  SEARCH KEYWORDS <keyword 1> <keyword 2> ... <keyword n>\n"
+                  << "  LINK <item number> <different item number>\n"
+                  << "  CONTEXT <item number>\n"
                   << "  OUTLINE\n"
+                  << "Book / persistence commands:\n"
+                  << "  NEWB <name>\n"
+                  << "  LOADB <name>\n"
+                  << "  DELETEB <name> <secret key>\n"
+                  << "  WHICHB\n"
+                  << "Help:\n"
+                  << "  USAGE [command]  (shows usage information)\n"
                   << "Type Ctrl-D (EOF) to exit.\n";
     }
 
@@ -179,6 +187,8 @@ private:
         if (startsWith(t, "CONTEXT "))
             return true;
         if (t == "OUTLINE")
+            return true;
+        if (startsWith(t, "USAGE"))
             return true;
         return false;
     }
@@ -224,7 +234,6 @@ private:
         return true;
     }
 };
-
 
 int main(int argc, char **argv)
 {

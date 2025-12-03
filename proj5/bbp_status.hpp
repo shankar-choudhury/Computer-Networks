@@ -8,17 +8,36 @@
 
 namespace bbp
 {
+#define BBP_ERROR_CODES(X)                        \
+    X(MalformedRequest, "ERR MALFORMED-REQUEST")  \
+    X(MalformedId, "ERR MALFORMED-ID")            \
+    X(MalformedType, "ERR MALFORMED-TYPE")        \
+    X(UnknownType, "ERR UNKNOWN-TYPE")            \
+    X(UnknownId, "ERR UNKNOWN-ID")                \
+    X(NotFound, "ERR NOT-FOUND")                  \
+    X(EmptyRequest, "ERR EMPTY-REQUEST")          \
+    X(CommandNotFound, "ERR COMMAND-NOT-FOUND")   \
+    X(TypeNotFound, "ERR TYPE-NOT-FOUND")         \
+    X(MissingBody, "ERR MISSING-BODY")            \
+    X(MissingTitle, "ERR MISSING-TITLE")          \
+    X(ItemExists, "ERR ITEM-EXISTS")              \
+    X(LinkExists, "ERR LINK-EXISTS")              \
+    X(UnknownRequest, "ERR UNKNOWN-REQUEST")      \
+    X(InvalidBookName, "ERR INVALID-BOOK-NAME")   \
+    X(BookExists, "ERR BOOK-EXISTS")              \
+    X(BookNotFound, "ERR BOOK-NOT-FOUND")         \
+    X(BookCreateFailed, "ERR BOOK-CREATE-FAILED") \
+    X(BookLoadFailed, "ERR BOOK-LOAD-FAILED")     \
+    X(BookDeleteFailed, "ERR BOOK-DELETE-FAILED") \
+    X(Unauthorized, "ERR UNAUTHORIZED")           \
+    X(CannotDeleteActiveBook, "ERR ACTIVE-BOOK")
 
     enum class ErrorCode
     {
-        MalformedRequest,
-        MalformedId,
-        MalformedType,
-        UnknownType,
-        UnknownId,
-        NotFound,
-        EmptyRequest,
-        UnknownRequest
+#define BBP_DEFINE_ERROR_ENUM(name, str) name,
+        BBP_ERROR_CODES(BBP_DEFINE_ERROR_ENUM)
+#undef BBP_DEFINE_ERROR_ENUM
+            Count
     };
 
     class ErrorMap
@@ -26,29 +45,35 @@ namespace bbp
     public:
         static const std::string &toString(ErrorCode code)
         {
-            static const std::array<std::string, 8> TABLE = {
-                "ERR MALFORMED-REQUEST",
-                "ERR MALFORMED-ID",
-                "ERR MALFORMED-TYPE",
-                "ERR UNKNOWN-TYPE",
-                "ERR UNKNOWN-ID",
-                "ERR NOT-FOUND",
-                "ERR EMPTY-REQUEST",
-                "ERR UNKNOWN-REQUEST"};
+            static const std::array<std::string,
+                                    static_cast<std::size_t>(ErrorCode::Count)>
+                TABLE = {
+#define BBP_DEFINE_ERROR_STR(name, str) str,
+                    BBP_ERROR_CODES(BBP_DEFINE_ERROR_STR)
+#undef BBP_DEFINE_ERROR_STR
+                };
 
-            static_assert(
-                TABLE.size() == static_cast<std::size_t>(ErrorCode::UnknownRequest) + 1,
-                "ErrorMap TABLE size must match ErrorCode enum");
+            static_assert(TABLE.size() == static_cast<std::size_t>(ErrorCode::Count),
+                          "ErrorMap TABLE size must match ErrorCode enum");
 
             return TABLE[static_cast<std::size_t>(code)];
         }
     };
 
+#define BBP_OK_CODES(X)                      \
+    X(Simple, "OK")                          \
+    X(Context, "OK CONTEXT")                 \
+    X(Outline, "OK OUTLINE")                 \
+    X(NewBookCreated, "OK NEW-BOOK-CREATED") \
+    X(BookLoaded, "OK BOOK-LOADED")          \
+    X(BookDeleted, "OK BOOK-DELETED")
+
     enum class OkCode
     {
-        Simple,
-        Context,
-        Outline
+#define BBP_DEFINE_OK_ENUM(name, str) name,
+        BBP_OK_CODES(BBP_DEFINE_OK_ENUM)
+#undef BBP_DEFINE_OK_ENUM
+            Count
     };
 
     class OkMap
@@ -56,18 +81,33 @@ namespace bbp
     public:
         static const std::string &toString(OkCode code)
         {
-            static const std::array<std::string, 3> TABLE = {
-                "OK",
-                "OK CONTEXT",
-                "OK OUTLINE"};
+            static const std::array<std::string,
+                                    static_cast<std::size_t>(OkCode::Count)>
+                TABLE = {
+#define BBP_DEFINE_OK_STR(name, str) str,
+                    BBP_OK_CODES(BBP_DEFINE_OK_STR)
+#undef BBP_DEFINE_OK_STR
+                };
 
-            static_assert(
-                TABLE.size() == static_cast<std::size_t>(OkCode::Outline) + 1,
-                "OkMap TABLE size must match OkCode enum");
+            static_assert(TABLE.size() == static_cast<std::size_t>(OkCode::Count),
+                          "OkMap TABLE size must match OkCode enum");
 
             return TABLE[static_cast<std::size_t>(code)];
         }
     };
+
+    inline std::string errorCodeToString(ErrorCode code)
+    {
+        return ErrorMap::toString(code);
+    }
+
+    inline std::string okCodeToString(OkCode code)
+    {
+        return OkMap::toString(code);
+    }
+
+#undef BBP_ERROR_CODES
+#undef BBP_OK_CODES
 
 }
 
