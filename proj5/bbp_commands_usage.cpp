@@ -88,7 +88,7 @@ void BbpCommandProcessor::handleUsage(const std::string &line, FILE *out)
     auto it = USAGE_MAP.find(cmd);
     if (it == USAGE_MAP.end())
     {
-        send_error(out, ErrorCode::CommandNotFound);
+        send_error(out, ErrorCode::NotFound);
         return;
     }
 
